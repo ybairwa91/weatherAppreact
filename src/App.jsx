@@ -3,6 +3,39 @@ import { Fragment, useEffect, useState } from "react";
 import "./index.css";
 import axios from "axios";
 import { Oval } from "react-loader-spinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFrown } from "@fortawesome/free-solid-svg-icons";
+
+const toDateFunction = () => {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const WeekDays = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const currentDate = new Date();
+  const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${
+    months[currentDate.getMonth()]
+  }`;
+  return date;
+};
 
 function App() {
   const [input, setInput] = useState("");
@@ -34,7 +67,7 @@ function App() {
           });
         })
         .catch((err) => {
-          setWeather({ ...weather, data: {}, error: true });
+          setWeather({ ...weather, loading: false, data: {}, error: true });
           setInput("");
           console.log("error", err);
         });
@@ -61,6 +94,40 @@ function App() {
           <br />
           <Oval type="oval" color="green" height={80} width={80} />
         </Fragment>
+      )}
+      {weather.error && (
+        <Fragment>
+          <span className="error-message">
+            <FontAwesomeIcon icon={faFrown} />
+            <span style={{ fontSize: "20px" }}>City not found</span>
+          </span>
+        </Fragment>
+      )}
+      {weather && weather.data && weather.data.main && (
+        <div>
+          {" "}
+          <div className="city-name">
+            <h2>
+              {weather.data.name}, <span>{weather.data.sys.country}</span>
+            </h2>
+          </div>
+          <div className="date">
+            <span>{toDateFunction()}</span>
+          </div>
+          <div className="icon-temp">
+            <img
+              className=""
+              src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}@2x.png`}
+              alt={weather.data.weather[0].description}
+            />
+            {Math.round(weather.data.main.temp)}
+            <sup className="deg">°C</sup>
+          </div>
+          <div className="des-wind">
+            <p>{weather.data.weather[0].description.toUpperCase()}</p>
+            <p>Wind Speed: {weather.data.wind.speed}m/s</p>
+          </div>
+        </div>
       )}
     </div>
   );
